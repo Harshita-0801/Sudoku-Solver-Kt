@@ -87,7 +87,9 @@ public class SudokuGrid {
                 sudokuCell[i][j].setFocusable(true);
                 sudokuCell[i][j].setFocusableInTouchMode(true);
                 sudokuCell[i][j].setInputType(InputType.TYPE_CLASS_NUMBER);
-                sudokuCell[i][j].addTextChangedListener(new TextWatcher() {
+
+                sudokuCell[i][j].addTextChangedListener(new TextWatcher()
+                {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -148,20 +150,24 @@ public class SudokuGrid {
     }
 
     public static void getCellValues(){
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                if(!gridCell[i][j].getText().toString().isEmpty()){
 
-                    cellValues[i][j]=Integer.parseInt(gridCell[i][j].getText().toString());
-                }else cellValues[i][j]=0;
+            for(int i=0;i<9;i++){
+                for(int j=0;j<9;j++){
+                    if(!gridCell[i][j].getText().toString().isEmpty()){
+
+                        cellValues[i][j]=Integer.parseInt(gridCell[i][j].getText().toString());
+                    }else cellValues[i][j]=0;
+                }
+            }
+            for(int i=0;i<9;i++) {
+                for (int j = 0; j < 9; j++) {
+                    copygrid[i][j] = cellValues[i][j];
+                }
             }
         }
-        for(int i=0;i<9;i++) {
-            for (int j = 0; j < 9; j++) {
-                copygrid[i][j] = cellValues[i][j];
-            }
-        }
-    }
+
+
+
 
     public static void updateGrid()
     {

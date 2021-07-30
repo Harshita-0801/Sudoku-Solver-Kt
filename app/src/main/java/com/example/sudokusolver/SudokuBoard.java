@@ -14,9 +14,9 @@ import com.example.sudokusolver.manual.SudokuGrid;
 
 
 public class SudokuBoard extends AppCompatActivity {
-    @Override
+   @Override
 
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sudoku_board);
         GridLayout gridLayout = findViewById(R.id.sudokuGrid);
@@ -25,6 +25,7 @@ public class SudokuBoard extends AppCompatActivity {
         Point size = new Point();
         display.getSize(size);
         int dimensions = size.x / 11;
+
         SudokuGrid.initGrid(this, gridLayout, dimensions);
 
         final Button solveButton= findViewById(R.id.solveButton);
@@ -33,6 +34,7 @@ public class SudokuBoard extends AppCompatActivity {
         solveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 SudokuGrid.getCellValues();
                 if(!SudokuGrid.getSolution()){
                     Toast.makeText(getApplicationContext(),"Solution does not exist",Toast.LENGTH_SHORT).show();

@@ -52,9 +52,8 @@ org/opencv/features2d/Feature2D.java
  org.opencv.features2d.Feature2D
 org/opencv/photo/MergeDebevec.java
  org.opencv.photo.MergeDebevec
-org/opencv/android/CameraGLSurfaceView.java
- org.opencv.android.CameraGLSurfaceView
- org.opencv.android.CameraGLSurfaceView$CameraTextureListener
+org/opencv/utils/Converters.java
+ org.opencv.utils.Converters
 org/opencv/core/Range.java
  org.opencv.core.Range
 org/opencv/features2d/BOWKMeansTrainer.java
@@ -141,10 +140,8 @@ org/opencv/imgproc/Moments.java
  org.opencv.imgproc.Moments
 org/opencv/features2d/BRISK.java
  org.opencv.features2d.BRISK
-org/opencv/android/Camera2Renderer.java
- org.opencv.android.Camera2Renderer
- org.opencv.android.Camera2Renderer$1
- org.opencv.android.Camera2Renderer$2
+org/opencv/ml/SVM.java
+ org.opencv.ml.SVM
 org/opencv/android/CameraRenderer.java
  org.opencv.android.CameraRenderer
 org/opencv/core/MatOfPoint.java
@@ -293,7 +290,10 @@ org/opencv/core/Point.java
  org.opencv.core.Point
 org/opencv/ml/StatModel.java
  org.opencv.ml.StatModel
-org/opencv/utils/Converters.java
- org.opencv.utils.Converters
-org/opencv/ml/SVM.java
- org.opencv.ml.SVM
+org/opencv/android/Camera2Renderer.java
+ org.opencv.android.Camera2Renderer
+ org.opencv.android.Camera2Renderer$1
+ org.opencv.android.Camera2Renderer$2
+org/opencv/android/CameraGLSurfaceView.java
+ org.opencv.android.CameraGLSurfaceView
+ org.opencv.android.CameraGLSurfaceView$CameraTextureListener

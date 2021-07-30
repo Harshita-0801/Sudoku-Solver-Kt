@@ -7,17 +7,20 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.sudokusolver.imagerec.DigitRecognizer;
 import com.example.sudokusolver.imagerec.PortraitCameraView;
+import com.example.sudokusolver.imagerec.SudokuChecker;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -159,6 +162,7 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
         mGray.release();
         mIntermediateMat.release();
         hierarchy.release();
+
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
@@ -197,10 +201,10 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
         int t = 3;
         if (points.length >= 4) {
             // draw the outer box
-            Imgproc.line(displayMat, new Point(points[0].x, points[0].y), new Point(points[1].x, points[1].y), new Scalar(255, 0, 0), 2);
-            Imgproc.line(displayMat, new Point(points[1].x, points[1].y), new Point(points[2].x, points[2].y), new Scalar(255, 0, 0), 2);
-            Imgproc.line(displayMat, new Point(points[2].x, points[2].y), new Point(points[3].x, points[3].y), new Scalar(255, 0, 0), 2);
-            Imgproc.line(displayMat, new Point(points[3].x, points[3].y), new Point(points[0].x, points[0].y), new Scalar(255, 0, 0), 2);
+            Imgproc.line(displayMat, new Point(points[0].x, points[0].y), new Point(points[1].x, points[1].y), new Scalar( 0,0,255), 2);
+            Imgproc.line(displayMat, new Point(points[1].x, points[1].y), new Point(points[2].x, points[2].y),new Scalar( 0,0,255), 2);
+            Imgproc.line(displayMat, new Point(points[2].x, points[2].y), new Point(points[3].x, points[3].y), new Scalar( 0,0,255), 2);
+            Imgproc.line(displayMat, new Point(points[3].x, points[3].y), new Point(points[0].x, points[0].y), new Scalar( 0,0,255), 2);
             // crop the image
             Rect R = new Rect(new Point(points[0].x - t, points[0].y - t), new Point(points[2].x + t, points[2].y + t));
             if (displayMat.width() > 1 && displayMat.height() > 1) {
@@ -278,20 +282,25 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
         tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "123456789");
         tessBaseApi.setVariable("classify_bin_numeric_mode", "1");
 
-        Mat output = cropped.clone();
+        final Mat output = cropped.clone();
+        ;
+
+        findViewById(R.id.captureButton).setVisibility(View.INVISIBLE);
+        findViewById(R.id.SaveImage).setVisibility(View.VISIBLE);
 
         int SUDOKU_SIZE = 9;
-        int IMAGE_WIDTH = output.width();
-        int IMAGE_HEIGHT = output.height();
+        final int IMAGE_WIDTH = output.width();
+        final int IMAGE_HEIGHT = output.height();
         Log.d(TAG,String.valueOf(IMAGE_WIDTH));
         Log.d(TAG,String.valueOf(IMAGE_HEIGHT));
         //double PADDING = IMAGE_WIDTH/25;
-        double xPADDING =20;
-        double yPADDING= 15;
-        int HSIZE = IMAGE_HEIGHT/SUDOKU_SIZE;
-        int WSIZE = IMAGE_WIDTH/SUDOKU_SIZE;
-        DigitRecognizer digitRecognizer = new DigitRecognizer();
-        digitRecognizer.ReadMNISTData();
+
+        final int HSIZE = IMAGE_HEIGHT/9;
+        final int WSIZE = IMAGE_WIDTH/9;
+        Log.d(TAG,"Square height"+String.valueOf(HSIZE));
+        Log.d(TAG,"Square width"+String.valueOf(WSIZE));
+        //DigitRecognizer digitRecognizer = new DigitRecognizer();
+        // digitRecognizer.ReadMNISTData();
 
         int[][] sudos = new int[SUDOKU_SIZE][SUDOKU_SIZE];
         int count=0;
@@ -301,19 +310,22 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
                 count++;
 
                 sudos[iy][ix] = 0;
-                int cx = (x + WSIZE / 2);
-               int cy = (y + HSIZE / 2);
-               Point p1 = new Point(cx - xPADDING, cy - yPADDING);
-                Point p2 = new Point(cx + xPADDING, cy + yPADDING);
+                /*int cx = (x + WSIZE / 2);
+                int cy = (y + HSIZE / 2);
+                Point p1 = new Point(cx - xPADDING, cy - yPADDING);
+                Point p2 = new Point(cx + xPADDING, cy + yPADDING);*/
                 //for correct 9*9 matrix block use this code
-                //int cx = x ;
-              //int cy = y;
-              //Point p1 = new Point(cx , cy );
-              //Point p2 = new Point(cx+WSIZE , cy +HSIZE);
-                Rect R = new Rect(p1, p2);
+                int  cx = x ;
+                int cy = y;
+                Point p1 = new Point(cx , cy);
+                Point p2 = new Point(cx+WSIZE , cy +HSIZE);
+               // Log.d(TAG,"Point :"+p1+" -> "+p2);
+                Rect R = new Rect(cx,cy,WSIZE,HSIZE);
                 Mat digit_cropped = new Mat(output, R);
                 Imgproc.GaussianBlur(digit_cropped,digit_cropped,new Size(5,5),0);
+
                 Imgproc.rectangle(output, p1, p2, new Scalar(0, 0, 0));
+
                 Bitmap digit_bitmap = Bitmap.createBitmap(digit_cropped.cols(), digit_cropped.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(digit_cropped, digit_bitmap);
 
@@ -323,58 +335,99 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
                     sudos[iy][ix] = Integer.valueOf(recognizedText);
 
                 }
-                Imgproc.putText(output, recognizedText, new Point(cx, cy), 1, 3.0f, new Scalar(0));
+                // Imgproc.putText(output, recognizedText, new Point(cx, cy), 1, 3.0f, new Scalar(0));
                 tessBaseApi.clear();
             }
             Log.i("testing",""+ Arrays.toString(sudos[iy]));
         }
 
-    Log.d(TAG,String.valueOf(count));
+        Log.d(TAG,String.valueOf(count));
         //Imgproc.cvtColor(output, output, Imgproc.COLOR_GRAY2RGBA);
 
         tessBaseApi.end();
 
 
-        // Testing data
-        //int[][] test_sudo = {{5,3,0,0,7,0,0,0,0}, {6,0,0,1,9,5,0,0,0}, {0,9,8,0,0,0,0,6,0},
-        //        {8,0,0,0,6,0,0,0,3}, {4,0,0,8,0,3,0,0,1}, {7,0,0,0,2,0,0,0,6}, {0,6,0,0,0,0,2,8,0}, {0,0,0,4,1,9,0,0,5}, {0,0,0,0,8,0,0,7,9}};
+        /*// Testing data
+        //sudos = new int[][]{{1, 0, 1, 0, 7, 0, 2, 0, 6}, {0, 3, 0, 0, 0, 0, 0, 4, 0}, {5, 0, 0, 0, 8, 0, 0, 0, 1}, {0, 0, 0, 1, 0, 7, 0, 0, 0}, {0, 4, 0, 0, 2, 0 ,0,8,0}, {0,1,0,9,0,1,0,0,0}, {3,0,0,0,0,0,0,8,0}, {0,6,0,0,5,0,0,3,0}, {0,1,2,0,1,0,7,0,1}};
 
         // Copy the captured array
+        for(int iy=0;iy<9;iy++)
+        Log.i("testing",""+ Arrays.toString(sudos[iy]));*/
         int[][] test_sudo = Arrays.copyOf(sudos, sudos.length);
 
         // make a copy of the captured array
-        int[][] temp = new int[9][9];
+        final int[][] temp = new int[9][9];
         for (int i = 0; i < 9; i++) {
             for (int y = 0; y < 9; y++) {
                 temp[i][y] = test_sudo[i][y];
             }
         }
 
-        // Solve the puzzle
-        Solver solver = new Solver(test_sudo, this);
-        int[][] result = solver.mainSolver();
+        // int[][] result2=new int [9][9];
 
 
-        // Print the result to screen
-        for (int y = 0, iy = 0; y < IMAGE_HEIGHT - HSIZE ; y+= HSIZE,iy++) {
-            for (int x = 0, ix = 0; x < IMAGE_WIDTH - WSIZE; x += WSIZE, ix++) {
-                if (temp[iy][ix]==0) {
-                    int cx = (x + WSIZE / 2);
-                    int cy = (y + HSIZE / 2);
-                    Point p = new Point(cx, cy);
-                    Imgproc.putText(output, result[iy][ix]+"", p, 1, 3.0f, new Scalar(255));
+        setContentView(R.layout.camera_sudoku);
+        GridLayout gridLayout = findViewById(R.id.sudokuGr);
+        //get screen size in pixels to adjust size of sudoku cells
+        Display display = getWindowManager().getDefaultDisplay();
+        android.graphics.Point size = new android.graphics.Point();
+        display.getSize(size);
+        int dimensions = size.x / 11;
+
+        SudokuChecker.initGrid(this, gridLayout, dimensions,test_sudo);
+
+        final Button solveButton= findViewById(R.id.solve);
+
+        solveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SudokuChecker.getCellValues();
+                if (!SudokuChecker.getSolution()) {
+                    Toast.makeText(getApplicationContext(), "Solution does not exist", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                Toast.makeText(getApplicationContext(), "Solution Found", Toast.LENGTH_SHORT).show();
+                int[][] result = SudokuChecker.updateSolution();
+
+                setContentView(R.layout.activity_show_camera);
+                ImageView iv = findViewById(R.id.solve_img);
+                iv.setVisibility(View.VISIBLE);
+
+         /*int EditText[][] gridCell;
+        //contains value of integer in cells, if blank then 0
+         int[][] cellValues=new int[9][9];
+         int[][] copygrid=new int[9][9];
+         int cellDimensions;/*
+
+
+                // Solve the puzzle
+       /* Solver solver = new Solver(test_sudo, this);
+        int[][] result = solver.mainSolver();*/
+
+
+                //Print the result to screen
+                for (int y = 0, iy = 0; y < IMAGE_HEIGHT-HSIZE; y += HSIZE, iy++) {
+                    for (int x = 0, ix = 0; x < IMAGE_WIDTH-WSIZE; x += WSIZE, ix++) {
+                            int cx = (x+WSIZE/4);
+                            int cy = (y+HSIZE);
+                            Point p = new Point(cx, cy);
+                            Imgproc.putText(output, result[iy][ix] + "", p, 2, 2.0f, new Scalar(255,0,0),1);
+
+                    }
+                    Log.i("Solved",""+ Arrays.toString(result[iy]));
+                }
+
+
+                // Display the image
+                Bitmap b = Bitmap.createBitmap(output.cols(), output.rows(), Bitmap.Config.ARGB_8888);
+                Utils.matToBitmap(output, b);
+                iv.setImageBitmap(b);
+
+                findViewById(R.id.captureButton).setVisibility(View.INVISIBLE);
+                findViewById(R.id.SaveImage).setVisibility(View.VISIBLE);
             }
-        }
-
-
-        // Display the image
-        Bitmap b = Bitmap.createBitmap(output.cols(), output.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(output, b);
-        iv.setImageBitmap(b);
-
-        findViewById(R.id.captureButton).setVisibility(View.INVISIBLE);
-        findViewById(R.id.SaveImage).setVisibility(View.VISIBLE);
+        });
 
         pd.dismiss();
     }
@@ -419,7 +472,7 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
 
     // Soduku Solver
 
-   private class Solver{
+    private class Solver{
 
         int[][] puzzle;
         Context context;
@@ -499,347 +552,3 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
         }
     }
 }
-
-
-/* public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-
-        Mat grayMat= inputFrame.gray();
-        Mat blurMat = new Mat();
-        Imgproc.GaussianBlur(grayMat, blurMat, new Size(5,5), 0);
-        Mat thresh = new Mat();
-        Imgproc.adaptiveThreshold(blurMat, thresh, 255,1,1,11,2);
-
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hier = new Mat();
-        Imgproc.findContours(thresh, contours, hier, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        hier.release();
-
-        MatOfPoint2f biggest = new MatOfPoint2f();
-        double max_area = 0;
-        for (MatOfPoint i : contours) {
-            double area = Imgproc.contourArea(i);
-            if (area > 100) {
-                MatOfPoint2f m = new MatOfPoint2f(i.toArray());
-                double peri = Imgproc.arcLength(m, true);
-                MatOfPoint2f approx = new MatOfPoint2f();
-                Imgproc.approxPolyDP(m, approx, 0.02 * peri, true);
-                if (area > max_area && approx.total() == 4) {
-                    biggest = approx;
-                    max_area = area;
-                }
-            }
-        }
-
-        // find the outer box
-        Mat displayMat = inputFrame.rgba();
-        Point[] points = biggest.toArray();
-        cropped = new Mat();
-        int t = 3;
-        if (points.length >= 4) {
-            // draw the outer box
-            Core.line(displayMat, new Point(points[0].x, points[0].y), new Point(points[1].x, points[1].y), new Scalar(255, 0, 0), 2);
-            Core.line(displayMat, new Point(points[1].x, points[1].y), new Point(points[2].x, points[2].y), new Scalar(255, 0, 0), 2);
-            Core.line(displayMat, new Point(points[2].x, points[2].y), new Point(points[3].x, points[3].y), new Scalar(255, 0, 0), 2);
-            Core.line(displayMat, new Point(points[3].x, points[3].y), new Point(points[0].x, points[0].y), new Scalar(255, 0, 0), 2);
-            // crop the image
-            Rect R = new Rect(new Point(points[0].x - t, points[0].y - t), new Point(points[2].x + t, points[2].y + t));
-            if (displayMat.width() > 1 && displayMat.height() > 1) {
-                cropped = new Mat(displayMat, R);
-            }
-        }
-
-        return displayMat;
-    }
-
-    public void capture(View v) {
-
-        if (cropped.width() < 1 || cropped.height() < 1) {
-            finish();
-        }
-
-        mOpenCvCameraView.setVisibility(View.GONE);
-        ImageView iv = (ImageView) findViewById(R.id.solve_img);
-        iv.setVisibility(View.VISIBLE);
-
-        // initialize the TessBase
-        tessBaseApi = new TessBaseAPI();
-        tessBaseApi.init(DATA_PATH, lang);
-        tessBaseApi.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_BLOCK);
-        tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "123456789");
-        tessBaseApi.setVariable("classify_bin_numeric_mode", "1");
-
-        Mat output = cropped.clone();
-
-        int SUDOKU_SIZE = 9;
-        int IMAGE_WIDTH = output.width();
-        int IMAGE_HEIGHT = output.height();
-        double PADDING = IMAGE_WIDTH/25;
-        int HSIZE = IMAGE_HEIGHT/SUDOKU_SIZE;
-        int WSIZE = IMAGE_WIDTH/SUDOKU_SIZE;
-        DigitRecognizer digitRecognizer = new DigitRecognizer();
-        digitRecognizer.ReadMNISTData();
-
-        int[][] sudos = new int[SUDOKU_SIZE][SUDOKU_SIZE];
-
-        // Divide the image to 81 small grid and do the digit recognition
-        for (int y = 0, iy = 0; y < IMAGE_HEIGHT - HSIZE ; y+= HSIZE,iy++) {
-            for (int x = 0, ix = 0; x < IMAGE_WIDTH - WSIZE; x += WSIZE, ix++) {
-                sudos[iy][ix] = 0;
-                int cx = (x + WSIZE / 2);
-                int cy = (y + HSIZE / 2);
-                Point p1 = new Point(cx - PADDING, cy - PADDING);
-                Point p2 = new Point(cx + PADDING, cy + PADDING);
-                Rect R = new Rect(p1, p2);
-                Mat digit_cropped = new Mat(output, R);
-                Imgproc.GaussianBlur(digit_cropped,digit_cropped,new Size(5,5),0);
-                Core.rectangle(output, p1, p2, new Scalar(0, 0, 0));
-                Bitmap digit_bitmap = Bitmap.createBitmap(digit_cropped.cols(), digit_cropped.rows(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(digit_cropped, digit_bitmap);
-
-                tessBaseApi.setImage(digit_bitmap);
-                String recognizedText = tessBaseApi.getUTF8Text();
-                if (recognizedText.length() == 1) {
-                    sudos[iy][ix] = Integer.valueOf(recognizedText);
-
-                }
-                Core.putText(output, recognizedText, new Point(cx, cy), 1, 3.0f, new Scalar(0));
-                tessBaseApi.clear();
-            }
-            Log.i("testing",""+ Arrays.toString(sudos[iy]));
-        }
-
-        //Imgproc.cvtColor(output, output, Imgproc.COLOR_GRAY2RGBA);
-
-        tessBaseApi.end();
-
-
-        // Testing data
-        //int[][] test_sudo = {{5,3,0,0,7,0,0,0,0}, {6,0,0,1,9,5,0,0,0}, {0,9,8,0,0,0,0,6,0},
-        //        {8,0,0,0,6,0,0,0,3}, {4,0,0,8,0,3,0,0,1}, {7,0,0,0,2,0,0,0,6}, {0,6,0,0,0,0,2,8,0}, {0,0,0,4,1,9,0,0,5}, {0,0,0,0,8,0,0,7,9}};
-
-        // Copy the captured array
-        int[][] test_sudo = Arrays.copyOf(sudos, sudos.length);
-
-        // make a copy of the captured array
-        int[][] temp = new int[9][9];
-        for (int i = 0; i < 9; i++) {
-            for (int y = 0; y < 9; y++) {
-                temp[i][y] = test_sudo[i][y];
-            }
-        }
-
-        // Solve the puzzle
-        Solver solver = new Solver(test_sudo, this);
-        int[][] result = solver.mainSolver();
-
-
-        // Print the result to screen
-        for (int y = 0, iy = 0; y < IMAGE_HEIGHT - HSIZE ; y+= HSIZE,iy++) {
-            for (int x = 0, ix = 0; x < IMAGE_WIDTH - WSIZE; x += WSIZE, ix++) {
-                if (temp[iy][ix]==0) {
-                    int cx = (x + WSIZE / 2);
-                    int cy = (y + HSIZE / 2);
-                    Point p = new Point(cx, cy);
-                    Core.putText(output, result[iy][ix]+"", p, 1, 3.0f, new Scalar(255));
-                }
-            }
-        }
-
-
-        // Display the image
-        Bitmap b = Bitmap.createBitmap(output.cols(), output.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(output, b);
-        iv.setImageBitmap(b);
-
-
-
-/*
-        Reference: http://stackoverflow.com/questions/10196198/how-to-remove-convexity-defects-in-a-sudoku-square
-        // Prepare the image
-        Mat gray = test.clone();
-        Mat mask = new Mat().zeros(gray.rows(), gray.cols(), CvType.CV_8U);
-        Mat kernel11 = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(11,11));
-        Mat close = new Mat();
-        Imgproc.morphologyEx(gray, close, Imgproc.MORPH_CLOSE, kernel11);
-        Mat div = new Mat();
-        Core.divide(gray, close, div);
-        Mat res = new Mat();
-        Core.normalize(div, res, 0, 255, Core.NORM_MINMAX);
-        Mat res2 = new Mat();
-        Imgproc.cvtColor(res, res2, Imgproc.COLOR_GRAY2RGB);
-        // Finding the outer box
-        Mat thresh = new Mat();
-        Imgproc.adaptiveThreshold(res, thresh, 255, 1, 1, 33,2);
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hier = new Mat();
-        Imgproc.findContours(thresh, contours, hier, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        double max_area = 0;
-        MatOfPoint best_cnt = null;
-        for (MatOfPoint cnt : contours) {
-            double area = Imgproc.contourArea(cnt);
-            if (area > 1000) {
-                if (area > max_area) {
-                    max_area = area;
-                    best_cnt = cnt;
-                }
-            }
-        }
-        ArrayList<MatOfPoint> list = new ArrayList<MatOfPoint>();
-        list.add(best_cnt);
-        Imgproc.drawContours(mask, list,0,new Scalar(255), -1);
-        Imgproc.drawContours(mask, list,0,new Scalar(0), 2);
-        Core.bitwise_and(res, mask, res);
-        // Finding vertical lines
-        Mat kernelx = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2,10));
-        Mat dx = new Mat();
-        Imgproc.Sobel(res, dx, CvType.CV_16S, 1,0);
-        Core.convertScaleAbs(dx,dx);
-        Core.normalize(dx,dx,0,255,Core.NORM_MINMAX);
-        close = new Mat();
-        Imgproc.threshold(dx, close, 0, 255, Imgproc.THRESH_OTSU);
-        Imgproc.morphologyEx(close, close, Imgproc.MORPH_DILATE, kernelx, new Point(), 1);
-        contours = new ArrayList<>();
-        Imgproc.findContours(close, contours, hier, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        for (MatOfPoint cnt : contours) {
-            Rect r = Imgproc.boundingRect(cnt);
-            int x = r.x;
-            int y = r.y;
-            int h = r.height;
-            int w = r.width;
-            ArrayList<MatOfPoint> list2 = new ArrayList<MatOfPoint>();
-            list2.add(cnt);
-            if (h/w > 5){
-                Imgproc.drawContours(close, list2, 0,new Scalar(255), -1);
-            } else {
-                Imgproc.drawContours(close, list2, 0, new Scalar(0), -1);
-            }
-        }
-        Imgproc.morphologyEx(close, close, Imgproc.MORPH_CLOSE,new Mat(), new Point(), 2);
-        Mat closex = close.clone();
-        //Finding Vertical lines
-        Mat kernely = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(10,2));
-        Mat dy = new Mat();
-        Imgproc.Sobel(res, dy, CvType.CV_16S, 0,2);
-        Core.convertScaleAbs(dy,dy);
-        Core.normalize(dy,dy,0,255,Core.NORM_MINMAX);
-        close = new Mat();
-        Imgproc.threshold(dy, close, 0, 255, Imgproc.THRESH_OTSU);
-        Imgproc.morphologyEx(close, close, Imgproc.MORPH_DILATE, kernely);
-        contours = new ArrayList<>();
-        Imgproc.findContours(close, contours, hier, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        for (MatOfPoint cnt : contours) {
-            Rect r = Imgproc.boundingRect(cnt);
-            int x = r.x;
-            int y = r.y;
-            int h = r.height;
-            int w = r.width;
-            ArrayList<MatOfPoint> list2 = new ArrayList<MatOfPoint>();
-            list2.add(cnt);
-            if (w/h > 5){
-                Imgproc.drawContours(close, list2, 0,new Scalar(255), -1);
-            } else {
-                Imgproc.drawContours(close, list2, 0, new Scalar(0), -1);
-            }
-        }
-        Imgproc.morphologyEx(close, close, Imgproc.MORPH_CLOSE,new Mat(), new Point(), 2);
-        Mat closey = close.clone();
-        // Finding Grid Points
-        Core.bitwise_and(closex, closey, res);
-        // Result
-        contours = new ArrayList<>();
-        Imgproc.findContours(res, contours, hier, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-        ArrayList<Point> centroids = new ArrayList<>();
-        for (MatOfPoint cnt : contours) {
-            Moments mom = Imgproc.moments(cnt);
-            int x = (int)(mom.get_m10()/mom.get_m00());
-            int y = (int)(mom.get_m01()/mom.get_m00());
-            Point p = new Point(x,y);
-            Core.circle(gray, p, 8, new Scalar(0,255,0),-1);
-            centroids.add(p);
-        }
-*/
-    //}
-
-
-/** Soduku Solver
-private class Solver{
-
-    int[][] puzzle;
-    Context context;
-    public Solver(int[][] puzzle, Context context) {
-        this.puzzle = puzzle;
-        this.context = context;
-    }
-
-    public int check (int row, int col, int num){
-
-        int rowStart = (row / 3) * 3;
-        int colStart = (col / 3) * 3;
-        int i;
-        for (i = 0; i < 9; i++) {
-            if (puzzle[row][i] == num) {
-                return 0;
-            }
-            if (puzzle[i][col] == num) {
-                return 0;
-            }
-            if (puzzle[rowStart + (i % 3)][colStart + (i / 3)] == num) {
-                return 0;
-            }
-        }
-        return 1;
-    }
-
-
-
-    public int solve(int row, int col) {
-        if (row < 9 && col < 9) {
-            if (puzzle[row][col] != 0) {
-                if ((col + 1) < 9)
-                    return solve(row, col + 1);
-                else if ((row + 1) < 9)
-                    return solve(row + 1, 0);
-                else
-                    return 1;
-            } else {
-                for (int i = 0; i < 9; i++) {
-                    if (check(row, col, i + 1) == 1) {
-                        puzzle[row][col] = i + 1;
-                        if (solve(row, col) == 1)
-                            return 1;
-                        else
-                            puzzle[row][col] = 0;
-                    }
-                }
-            }
-            return 0;
-        } else return 1;
-    }
-
-    public int[][] mainSolver() {
-        int[][] result = new int[9][9];
-
-        if (solve(0, 0) == 1) {
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
-                    result[i][j] = puzzle[i][j];
-                }
-            }
-            String s="";
-            for (int i = 0; i < 9; i++) {
-                s = s + Arrays.toString(puzzle[i]) + " \n";
-            }
-            Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
-            toast.show();
-
-        } else {
-            Toast toast = Toast.makeText(context, "Not Valid!", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
-
-        return puzzle;
-    }
-}
-}*/
-
