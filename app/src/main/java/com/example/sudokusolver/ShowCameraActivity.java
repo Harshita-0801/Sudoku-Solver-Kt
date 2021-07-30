@@ -1,7 +1,6 @@
 package com.example.sudokusolver;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -472,7 +471,7 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
 
     // Soduku Solver
 
-    private class Solver{
+    /*private class Solver{
 
         int[][] puzzle;
         Context context;
@@ -550,5 +549,5 @@ public class ShowCameraActivity extends AppCompatActivity implements CvCameraVie
 
             return puzzle;
         }
-    }
+    }*/
 }
