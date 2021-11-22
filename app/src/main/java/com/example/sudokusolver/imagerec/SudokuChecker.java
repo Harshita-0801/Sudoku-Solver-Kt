@@ -149,8 +149,9 @@ public class SudokuChecker {
         return sudokuCell;
     }
 
-    public static void getCellValues() {
+    public static int[][] getCellValues() {
 
+        int[][] x = new int[9][9];
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (!gridCell[i][j].getText().toString().isEmpty()) {
@@ -160,6 +161,12 @@ public class SudokuChecker {
             }
         }
 
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                x[i][j] = cellValues[i][j];
+            }
+        }
+        return x;
     }
 
 
