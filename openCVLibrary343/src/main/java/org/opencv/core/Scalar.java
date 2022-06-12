@@ -30,6 +30,7 @@ public class Scalar {
         }
     }
 
+
     public void set(double[] vals) {
         if (vals != null) {
             val[0] = vals.length > 0 ? vals[0] : 0;

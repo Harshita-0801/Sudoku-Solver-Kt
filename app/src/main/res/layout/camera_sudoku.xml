@@ -61,7 +61,7 @@
                     android:shadowColor="#000"
                     android:text="SOLVE"
                     android:textColor="#FFF"
-                    android:layout_below="@+id/sudokuGrid"
+                    android:layout_below="@+id/sudokuGr"
                     tools:ignore="NotSibling" />
 
                 <!-- <Space
