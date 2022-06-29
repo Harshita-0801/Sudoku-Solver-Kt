@@ -49,10 +49,13 @@ Removing the color and thresholding the image to make it binary using an adaptiv
 <br>-> A bit more image clean up (I.e. removing the grid that we found so that if some of it gets into the extracted image it doesn't confuse the OCR algorithm).
 <br>-> Stretching the image straight using the OpenCV "Warp Perspective" transform.
   </ul>
+ 
 ### EXTRACTING THE DIGITS :-
 The height and width of the image is calculated through mat obtained from the capture() containing the cropped image of sudoku. This is then further divided into 9X9 grid (81 cells) in order to work on the individual cell. 
 <br>The rect is created around a cell and the cropped digit mat is created. It is then converted to a bitmap which is processed by the OCR to recognise the digit.
 The extracted digits are saved in a matrix which are displayed in the edit section.
+
+ ![Untitled](https://user-images.githubusercontent.com/64244267/176521375-db6dd9db-942f-4cd9-90d2-1324491d4816.png)
 
 ### EDIT SECTION :-
 In this view the matrix of the digits recognised by the digit recogniser are displayed on the 9X9 grid. 
@@ -63,7 +66,9 @@ In this view the matrix of the digits recognised by the digit recogniser are dis
 ### PRINTING THE SOLUTION AND SAVING IT :- 
 The result is printed on the problem image and the solution is saved to the memory using save button. This will create an album named sdCard and add the image to the folder in jpg format. 
 
-### DEMONSTRATION :- 
+<hr>
+
+## _DEMONSTRATION_ 
  Click on the image below to see the demonstration:-
  
  <a href ="https://drive.google.com/file/d/1BaBd8zU7Bbtrx1ecYOY15FeWdcRHxa4I/view?usp=sharing"> <img src="https://media.istockphoto.com/photos/demo-sign-colorful-tags-picture-id472909414?k=20&m=472909414&s=612x612&w=0&h=lfJ4C6qJEAfNUkOeZgqIsJ6RtZMENS35KXavRMIXKe8=" width="300" height="150"> </a>
