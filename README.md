@@ -66,7 +66,7 @@ The result is printed on the problem image and the solution is saved to the memo
 ### DEMONSTRATION :- 
  Click on the image below to see the demonstration:-
  
- <a href ="https://drive.google.com/file/d/1BaBd8zU7Bbtrx1ecYOY15FeWdcRHxa4I/view?usp=sharing"> <img src="https://drive.google.com/file/d/1qQAUwDRsktR1wejsRlWG4mKsxd11DL0P/view?usp=sharing" width="100" height="100"> </a>
+ <a href ="https://drive.google.com/file/d/1BaBd8zU7Bbtrx1ecYOY15FeWdcRHxa4I/view?usp=sharing"> <img src="https://media.istockphoto.com/photos/demo-sign-colorful-tags-picture-id472909414?k=20&m=472909414&s=612x612&w=0&h=lfJ4C6qJEAfNUkOeZgqIsJ6RtZMENS35KXavRMIXKe8=" width="300" height="150"> </a>
 
 
 
